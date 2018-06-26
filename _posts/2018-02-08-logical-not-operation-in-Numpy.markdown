@@ -99,12 +99,15 @@ print(neutrals)
 
     [False, True, False, False, False, False]
 
-[Reference][python-numpy-bool]
-[Reference][Python-bitwise]
-[Reference][Python-logical-not]
-[Reference][Numpy-Bool-Negation]
 
-[python-numpy-bool]: http://joergdietrich.github.io/python-numpy-bool-types.html
+<br>
+### Reference
+[Python-numpy-bool][Python-numpy-bool]  
+[Python-bitwise][Python-bitwise]  
+[Python-logical-not][Python-logical-not]  
+[Numpy-bool-negation][Numpy-Bool-Negation]  
+
+[Python-numpy-bool]: http://joergdietrich.github.io/python-numpy-bool-types.html
 [Python-bitwise]:   https://stackoverflow.com/questions/791328/how-does-the-bitwise-complement-operator-tilde-work
 [Python-logical-not]: https://stackoverflow.com/questions/21415661/logic-operator-for-boolean-indexing-in-pandas/21415990
 [Numpy-Bool-Negation]: https://stackoverflow.com/questions/13600988/python-tilde-unary-operator-as-negation-numpy-bool-array
