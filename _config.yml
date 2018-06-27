@@ -4,7 +4,7 @@ description: 'How ya doing, data?'
 url: 'https://HughKu.github.io/'
 baseurl: ''
 # google_analytics: 'UA-XXXXXX-X'
-# disqus_shortname: 'your-disqus-name'
+disqus_shortname: 'hughku'
 
 author:
   name: 'Hugh Ku'
