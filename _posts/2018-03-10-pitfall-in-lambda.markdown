@@ -1,8 +1,10 @@
 ---
-title:  "Pitfall in Lambda"
-date:   2018-03-10 17:25:03
-categories: [Python]
-tags: [Python, Lambda, Closure, Partial]
+layout: post
+title: Pitfall in Lambda
+date: 2018-03-10 17:25:03
+description: You’ll find this post in your `_posts` directory. Go ahead and edit it and re-build the site to see your changes. # Add post description (optional)
+img: pitfall.jpg # Add image post (optional)
+tags: [Python, Lambda, Closure, Partial] # add tag
 ---
 
 嗨，大家好，這篇又再談談我遇到的另外一個問題：在建置機器學習模型中需要測試多個客製化的量測函式 (_實際的問題我留在下一篇再來講_)，本篇以簡單的例子呈現原始問題的所在：
@@ -24,7 +26,7 @@ print(w_metric([1, 2], [4, 5], [2, 1]))
 ```
 
 <br>
-### Using Lambda
+## Using Lambda
 接著，我把三組帶有不同`W`的量測函式物件打包起來，結果輸出不如預期；三組`W`確實在list comprehension裡面被展開，哪裡出錯了？
 
 ``` python
@@ -48,7 +50,7 @@ for metric in metric_list:
 ```
 
 <br>
-### Late Binding - What a Gotcha
+## Late Binding - What a Gotcha
 
 吼吼抓到了，透過下面這段程式碼來理解，會發現變數`b`和函式`simple_line`之間的關係不像在C/C++的模式，但程式碼可以正常運作，[Python的解析變數是**當需要用到的時候**][1]，透過[LEGB][2] (local->enclosing->global->built-in) 規則去作name binding。
 
@@ -118,9 +120,9 @@ for metric in metric_list:
 ```
 
 <br>
-### Solution
+## Solution
 
-#### **Early Binding - Default Argument**
+### **Early Binding - Default Argument**
 那就early binding吧，因為Python的機制是[function default argument][4]實際上在definition time就被決定的，所以function的每一次呼叫都是使用同樣的default argument value。
 ``` python
 def make_w_metric_list(W):
@@ -136,7 +138,7 @@ for metric in metric_list:
 # >> 18.0
 ```
 
-#### **Functool.Partial**
+### **Functool.Partial**
 另外，我認為這個方式可讀性比較高，[functool.partial][5]可以把callable的物件重新包裝，並且可以預先設定default argument的值固定住。
 
 ``` python
@@ -154,7 +156,7 @@ for metric in metric_list:
 ```
 
 <br>
-### Reference
+## Reference
 [Python-Execution-Model][1]  
 [Python-Scope-of-Variables][2]  
 [Python-Live-Object-Inspection][3]  

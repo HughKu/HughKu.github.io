@@ -1,41 +1,40 @@
-# Site settings
-title: Hugh's Note
-description: 'How ya doing, data?'
-url: 'https://HughKu.github.io/'
-baseurl: ''
-# google_analytics: 'UA-XXXXXX-X'
-disqus_shortname: 'hughku'
+title: Hugh's Sharing Notes
+description: > # this means to ignore newlines until "baseurl:"
+  Write an awesome description for your new site here. You can edit this
+  line in _config.yml. It will appear in your document head meta (for
+  Google search results) and in your feed.xml site description.
+permalink: ':title/'
+baseurl: "" # the subpath of your site, e.g. /blog
+url: "https://HughKu.github.io/" # the base hostname & protocol for your site, e.g. http://example.com
+site-twitter: #if your site has a twitter account, enter it here
 
+# Author Settings
 author:
-  name: 'Hugh Ku'
+  name: Hugh Ku
   email: hughku@gmail.com
   github_username:  HughKu
   linkedin_username: wei-lin-ku-4552a956
+author: Wei-Lin (Hugh) Ku # add your name
+author-img: hugh-ku.jpg # add your photo
+about-author: 'I enjoy applying machine learning and deep learning to data of different fields from image and video to finance. Mostly speak Python and understand C++ and Javascript.' # add description
+social-github: HughKu # add your Github handle
+social-linkedin: wei-lin-ku-4552a956 # add your Linkedin handle
+social-email: hughku@gmail.com # add your Email address
 
-defaults:
-  -
-    scope:
-      path: ''
-      type: 'posts'
-    values:
-        layout: 'post'
+# Disqus
+discus-identifier: 'hughku' # add your discus identifier
 
-# Build settings
-destination: _site
-paginate: 10
-permalink: /:year/:title/
+# Tracker
+analytics: # Google Analytics
+
+# Build Settings
 markdown: kramdown
-highlighter: rouge
+plugins:
+  - jekyll-sitemap
+  - jekyll-paginate
+  - jemoji
 
-sass:
-    sass_dir: _sass
-    style: compressed
+paginate: 8
+paginate_path: "/page/:num"
 
-kramdown:
-  # use Github Flavored Markdown
-  input: GFM
-  # do not replace newlines by <br>s
-  hard_wrap: false
-
-plugins: ['jekyll-paginate']
-exclude: ['README.md', 'Gemfile', 'Gemfile.lock', 'screenshot.png']
+exclude: ["node_modules", "gulpfile.js", "package.json", "yarn.lock"]

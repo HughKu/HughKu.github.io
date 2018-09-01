@@ -1,8 +1,10 @@
 ---
-title:  "Logical Not Operation in Numpy"
-date:   2018-02-08 13:50:23
-categories: [Python]
-tags: [Python, Numpy]
+layout: post
+title: Logical Not Operation in Numpy
+date: 2018-02-08 13:50:23
+description: You’ll find this post in your `_posts` directory. Go ahead and edit it and re-build the site to see your changes. # Add post description (optional)
+img: python.png # Add image post (optional)
+tags: [Python, Numpy] # add tag
 ---
 
 建置預測模型過程中，我把所面臨的問題簡化成分類問題。首先，預處理ground truth data，並將它轉成one-hot vector。
@@ -30,9 +32,9 @@ negatives = (df['d1'] - df['d2'] <= -10)
 
 
 <br>
-### Logical Not in Numpy Bool
+## Logical Not in Numpy Bool
 對於neutrals來說，可以透過nor運算來得到。問題來了，以下三種方式到底哪個可以得到預期的效果？
-#### **使用Bitwise Not**
+### **使用Bitwise Not**
 效果等同於`numpy.invert`，也能得到預期效果。
 ``` python
 neutrals  = ~(positives.values | negatives.values)
@@ -40,7 +42,7 @@ neutrals  = ~(positives.values | negatives.values)
 # >> [False True False False False False]
 ```
 
-#### **使用Logical Not**
+### **使用Logical Not**
 會造成錯誤，畢竟我的目的是元素與元素的對決。
 這個運算子是對於容器整體的判斷，而且必須指明條件，是要**任一個元素**或是**全部元素**都符合才行。
 ``` python
@@ -49,7 +51,7 @@ neutrals  = not(positives.values | negatives.values)
 # ValueError: The truth value of an array with more than one element is ambiguous. Use a.any() or a.all()
 ```
 
-#### **使用Numpy Element-wise Not**
+### **使用Numpy Element-wise Not**
 使用Numpy內建對於容器的真值判斷含式，這個是元素與元素間的比較，符合需求。
 ``` python
 neutrals  = np.logical_not(positives.values | negatives.values)
@@ -58,7 +60,7 @@ neutrals  = np.logical_not(positives.values | negatives.values)
 ```
 
 <br>
-### Logical Not in Python Bool
+## Logical Not in Python Bool
 然而，這樣的情況在Python boolean底下是不同的。
 ```python
 d1 = [10, 20, 30, 40, 50, 60]
@@ -69,7 +71,7 @@ negatives = [x-y<=-10 for x, y in zip(d1, d2)]
 ```
 
 
-#### **使用Bitwise Not**
+### **使用Bitwise Not**
 注意，Python boolean事實上是用int type來表示的，使用`~`會讓python boolean進行`two's complement`，所以以下的輸出是合理的現象。
 ```python
 neutrals = [~(x|y) for x, y in zip(positives, negatives)]
@@ -78,7 +80,7 @@ print(neutrals)
 # >> [-2, -1, -2, -2, -2, -2]
 ```
 
-#### **使用Logical Not**
+### **使用Logical Not**
 然而`not`關鍵字能真實反映python boolean於**True/False**的互補。
 ```python
 neutrals = [not(x|y) for x, y in zip(positives, negatives)]
@@ -88,7 +90,7 @@ print(neutrals)
 ```
 
 <br>
-### Reference
+## Reference
 [Python-numpy-bool][Python-numpy-bool]  
 [Python-bitwise][Python-bitwise]  
 [Python-logical-not][Python-logical-not]  

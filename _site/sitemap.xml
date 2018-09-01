@@ -1,75 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  
-    
-    <url>
-      <loc>http://localhost:4000/2018/logical-not-operation-in-Numpy/</loc>
-      
-        <lastmod>2018-02-08T21:50:23+08:00</lastmod>
-      
-      
-        <changefreq>monthly</changefreq>
-      
-      
-        <priority>0.5</priority>
-      
-    </url>
-    
-  
-  
-    
-  
-    
-    <url>
-      <loc>http://localhost:4000/feed.xml</loc>
-      
-        <lastmod>2018-06-26T14:56:12+08:00</lastmod>
-      
-      
-        <changefreq>monthly</changefreq>
-      
-      
-        <priority>0.3</priority>
-      
-    </url>
-    
-  
-    
-    <url>
-      <loc>http://localhost:4000/humans.txt</loc>
-      
-        <lastmod>2018-06-26T14:56:12+08:00</lastmod>
-      
-      
-        <changefreq>monthly</changefreq>
-      
-      
-        <priority>0.3</priority>
-      
-    </url>
-    
-  
-    
-  
-    
-  
-    
-    <url>
-      <loc>http://localhost:4000/css/main.css</loc>
-      
-        <lastmod>2018-06-26T14:56:12+08:00</lastmod>
-      
-      
-        <changefreq>monthly</changefreq>
-      
-      
-        <priority>0.3</priority>
-      
-    </url>
-    
-  
-    
-  
-    
-  
+<urlset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd" xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+<url>
+<loc>http://localhost:4000/logical-not-operation-in-Numpy/</loc>
+<lastmod>2018-02-08T21:50:23+08:00</lastmod>
+</url>
+<url>
+<loc>http://localhost:4000/pitfall-in-lambda/</loc>
+<lastmod>2018-03-11T01:25:03+08:00</lastmod>
+</url>
+<url>
+<loc>http://localhost:4000/example-wise-custom-loss-in-Keras/</loc>
+<lastmod>2018-04-14T04:23:48+08:00</lastmod>
+</url>
+<url>
+<loc>http://localhost:4000/</loc>
+</url>
+<url>
+<loc>http://localhost:4000/tags/</loc>
+</url>
 </urlset>
