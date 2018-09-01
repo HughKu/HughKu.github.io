@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>Logical Not Operation in Numpy - Hugh's Sharing Notes</title>
+
+  <!-- Edit site and author settings in `_config.yml` to make the social details your own -->
+
+    <meta content="Hugh's Sharing Notes" property="og:site_name">
+  
+    <meta content="Logical Not Operation in Numpy" property="og:title">
+  
+  
+    <meta content="article" property="og:type">
+  
+  
+    <meta content="You’ll find this post in your `_posts` directory. Go ahead and edit it and re-build the site to see your changes." property="og:description">
+  
+  
+    <meta content="http://localhost:4000/logical-not-operation-in-Numpy/" property="og:url">
+  
+  
+    <meta content="2018-02-08T21:50:23+08:00" property="article:published_time">
+    <meta content="http://localhost:4000/about/" property="article:author">
+  
+  
+    <meta content="http://localhost:4000/assets/img/python.png" property="og:image">
+  
+  
+    
+  
+  
+    
+    <meta content="Python" property="article:tag">
+    
+    <meta content="Numpy" property="article:tag">
+    
+  
+
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:site" content="@">
+    <meta name="twitter:creator" content="@">
+  
+    <meta name="twitter:title" content="Logical Not Operation in Numpy">
+  
+  
+    <meta name="twitter:url" content="http://localhost:4000/logical-not-operation-in-Numpy/">
+  
+  
+    <meta name="twitter:description" content="You’ll find this post in your `_posts` directory. Go ahead and edit it and re-build the site to see your changes.">
+  
+  
+    <meta name="twitter:image:src" content="http://localhost:4000/assets/img/python.png">
+  
+
+	<meta name="description" content="You’ll find this post in your `_posts` directory. Go ahead and edit it and re-build the site to see your changes.">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+	<meta property="og:image" content="">
+	<link rel="shortcut icon" href="/assets/img/favicon/favicon.ico" type="image/x-icon">
+	<link rel="apple-touch-icon" href="/assets/img/favicon/apple-touch-icon.png">
+	<link rel="apple-touch-icon" sizes="72x72" href="/assets/img/favicon/apple-touch-icon-72x72.png">
+	<link rel="apple-touch-icon" sizes="144x144" href="/assets/img/favicon/apple-touch-icon-144x144.png">
+	<!-- Chrome, Firefox OS and Opera -->
+	<meta name="theme-color" content="#263959">
+	<!-- Windows Phone -->
+	<meta name="msapplication-navbutton-color" content="#263959">
+	<!-- iOS Safari -->
+	<meta name="apple-mobile-web-app-status-bar-style" content="#263959">
+	<!-- Google Fonts -->
+	<link href="https://fonts.googleapis.com/css?family=PT+Serif:400,700" rel="stylesheet">
+	<link href="https://fonts.googleapis.com/css?family=Lato:300,400,700" rel="stylesheet">
+	<!-- Font Awesome -->
+	<link rel="stylesheet" href="/assets/fonts/font-awesome/css/font-awesome.min.css">
+	<!-- Styles -->
+	<link rel="stylesheet" href="/assets/css/main.css">
+
+   <script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+      tex2jax: {
+        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre'],
+        inlineMath: [['$','$']]
+      }
+    });
+  </script>
+  <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML" type="text/javascript"></script> 
+</head>
+
+<body>
+
+  <div class="wrapper">
+    <aside class="sidebar">
+  <header>
+    <div class="about">
+      <div class="cover-author-image">
+        <a href="/"><img src="/assets/img/hugh-ku.jpg" alt="Wei-Lin (Hugh) Ku"></a>
+      </div>
+      <div class="author-name">Wei-Lin (Hugh) Ku</div>
+      <p>I enjoy applying machine learning and deep learning to data of different field from image and video to finance. Mostly speak Python, C++ and Javascript as well.</p>
+    </div>
+  </header> <!-- End Header -->
+  <footer>
+    <section class="contact">
+      <h3 class="contact-title">Contact me</h3>
+      <ul>
+        
+          <li class="github"><a href="http://github.com/HughKu" target="_blank"><i class="fa fa-github"></i></a></li>
+        
+        
+          <li class="linkedin"><a href="https://in.linkedin.com/in/wei-lin-ku-4552a956" target="_blank"><i class="fa fa-linkedin"></i></a></li>
+        
+        
+          <li class="email"><a href="mailto:hughku@gmail.com"><i class="fa fa-envelope-o"></i></a></li>
+        
+      </ul>
+    </section> <!-- End Section Contact -->
+    <div class="copyright">
+      <p>2018 &copy; Wei-Lin (Hugh) Ku</p>
+    </div>
+  </footer> <!-- End Footer -->
+</aside> <!-- End Sidebar -->
+<div class="content-box clearfix">
+  <article class="article-page">
+  <div class="page-content">
+    
+    <div class="page-cover-image">
+      <figure>
+        <img class="page-image" src=/assets/img/python.png alt="Logical Not Operation in Numpy">
+        
+      </figure>
+    </div> <!-- End Page Cover Image -->
+    
+    <div class="wrap-content">
+      <header class="header-page">
+        <h1 class="page-title">Logical Not Operation in Numpy</h1>
+        <div class="page-date"><span>2018, Feb 08&nbsp;&nbsp;&nbsp;&nbsp;</span></div>
+      </header>
+      <p>建置預測模型過程中，我把所面臨的問題簡化成分類問題。首先，預處理ground truth data，並將它轉成one-hot vector。
+以下使用簡單的範例：</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">d</span> <span class="o">=</span> <span class="p">{</span><span class="s">'d1'</span><span class="p">:</span> <span class="p">[</span><span class="mi">10</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="mi">30</span><span class="p">,</span> <span class="mi">40</span><span class="p">,</span> <span class="mi">50</span><span class="p">,</span> <span class="mi">60</span><span class="p">],</span> <span class="s">'d2'</span><span class="p">:</span> <span class="p">[</span><span class="mi">25</span><span class="p">,</span> <span class="mi">11</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="mi">30</span><span class="p">,</span> <span class="mi">40</span><span class="p">,</span> <span class="mi">50</span><span class="p">]}</span>
+<span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">d</span><span class="p">)</span>
+
+<span class="c">#	   d1  d2</span>
+<span class="c">#	0  10  25</span>
+<span class="c">#	1  20  11</span>
+<span class="c">#	2  30  20</span>
+<span class="c">#	3  40  30</span>
+<span class="c">#	4  50  40</span>
+<span class="c">#	5  60  50</span>
+</code></pre></div></div>
+
+<p>我想要把兩個欄位的數據作個轉換，根據threshold分為三個類別，大於10的分到positives，小於-10的分到negatives，至於剩下的就被分到neutrals。 前兩者很好處理，透過<code class="highlighter-rouge">pandas.series</code>邏輯運算子。</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">positives</span> <span class="o">=</span> <span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s">'d1'</span><span class="p">]</span> <span class="o">-</span> <span class="n">df</span><span class="p">[</span><span class="s">'d2'</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="mi">10</span><span class="p">)</span>
+<span class="n">negatives</span> <span class="o">=</span> <span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s">'d1'</span><span class="p">]</span> <span class="o">-</span> <span class="n">df</span><span class="p">[</span><span class="s">'d2'</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="o">-</span><span class="mi">10</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p><br /></p>
+<h2 id="logical-not-in-numpy-bool">Logical Not in Numpy Bool</h2>
+<p>對於neutrals來說，可以透過nor運算來得到。問題來了，以下三種方式到底哪個可以得到預期的效果？</p>
+<h3 id="使用bitwise-not"><strong>使用Bitwise Not</strong></h3>
+<p>效果等同於<code class="highlighter-rouge">numpy.invert</code>，也能得到預期效果。</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">neutrals</span>  <span class="o">=</span> <span class="o">~</span><span class="p">(</span><span class="n">positives</span><span class="o">.</span><span class="n">values</span> <span class="o">|</span> <span class="n">negatives</span><span class="o">.</span><span class="n">values</span><span class="p">)</span>
+
+<span class="c"># &gt;&gt; [False True False False False False]</span>
+</code></pre></div></div>
+
+<h3 id="使用logical-not"><strong>使用Logical Not</strong></h3>
+<p>會造成錯誤，畢竟我的目的是元素與元素的對決。
+這個運算子是對於容器整體的判斷，而且必須指明條件，是要<strong>任一個元素</strong>或是<strong>全部元素</strong>都符合才行。</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">neutrals</span>  <span class="o">=</span> <span class="ow">not</span><span class="p">(</span><span class="n">positives</span><span class="o">.</span><span class="n">values</span> <span class="o">|</span> <span class="n">negatives</span><span class="o">.</span><span class="n">values</span><span class="p">)</span>
+
+<span class="c"># ValueError: The truth value of an array with more than one element is ambiguous. Use a.any() or a.all()</span>
+</code></pre></div></div>
+
+<h3 id="使用numpy-element-wise-not"><strong>使用Numpy Element-wise Not</strong></h3>
+<p>使用Numpy內建對於容器的真值判斷含式，這個是元素與元素間的比較，符合需求。</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">neutrals</span>  <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">logical_not</span><span class="p">(</span><span class="n">positives</span><span class="o">.</span><span class="n">values</span> <span class="o">|</span> <span class="n">negatives</span><span class="o">.</span><span class="n">values</span><span class="p">)</span>
+
+<span class="c"># &gt;&gt; [False True False False False False]</span>
+</code></pre></div></div>
+
+<p><br /></p>
+<h2 id="logical-not-in-python-bool">Logical Not in Python Bool</h2>
+<p>然而，這樣的情況在Python boolean底下是不同的。</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">d1</span> <span class="o">=</span> <span class="p">[</span><span class="mi">10</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="mi">30</span><span class="p">,</span> <span class="mi">40</span><span class="p">,</span> <span class="mi">50</span><span class="p">,</span> <span class="mi">60</span><span class="p">]</span>
+<span class="n">d2</span> <span class="o">=</span> <span class="p">[</span><span class="mi">25</span><span class="p">,</span> <span class="mi">11</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="mi">30</span><span class="p">,</span> <span class="mi">40</span><span class="p">,</span> <span class="mi">50</span><span class="p">]</span>
+
+<span class="n">positives</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span><span class="o">-</span><span class="n">y</span><span class="o">&gt;=</span><span class="mi">10</span> <span class="k">for</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">d1</span><span class="p">,</span> <span class="n">d2</span><span class="p">)]</span>
+<span class="n">negatives</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span><span class="o">-</span><span class="n">y</span><span class="o">&lt;=-</span><span class="mi">10</span> <span class="k">for</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">d1</span><span class="p">,</span> <span class="n">d2</span><span class="p">)]</span>
+</code></pre></div></div>
+
+<h3 id="使用bitwise-not-1"><strong>使用Bitwise Not</strong></h3>
+<p>注意，Python boolean事實上是用int type來表示的，使用<code class="highlighter-rouge">~</code>會讓python boolean進行<code class="highlighter-rouge">two's complement</code>，所以以下的輸出是合理的現象。</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">neutrals</span> <span class="o">=</span> <span class="p">[</span><span class="o">~</span><span class="p">(</span><span class="n">x</span><span class="o">|</span><span class="n">y</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">positives</span><span class="p">,</span> <span class="n">negatives</span><span class="p">)]</span>
+<span class="k">print</span><span class="p">(</span><span class="n">neutrals</span><span class="p">)</span>
+
+<span class="c"># &gt;&gt; [-2, -1, -2, -2, -2, -2]</span>
+</code></pre></div></div>
+
+<h3 id="使用logical-not-1"><strong>使用Logical Not</strong></h3>
+<p>然而<code class="highlighter-rouge">not</code>關鍵字能真實反映python boolean於<strong>True/False</strong>的互補。</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">neutrals</span> <span class="o">=</span> <span class="p">[</span><span class="ow">not</span><span class="p">(</span><span class="n">x</span><span class="o">|</span><span class="n">y</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">positives</span><span class="p">,</span> <span class="n">negatives</span><span class="p">)]</span>
+<span class="k">print</span><span class="p">(</span><span class="n">neutrals</span><span class="p">)</span>
+
+<span class="c"># &gt;&gt; [False, True, False, False, False, False]</span>
+</code></pre></div></div>
+
+<p><br /></p>
+<h2 id="reference">Reference</h2>
+<p><a href="http://joergdietrich.github.io/python-numpy-bool-types.html">Python-numpy-bool</a><br />
+<a href="https://stackoverflow.com/questions/791328/how-does-the-bitwise-complement-operator-tilde-work">Python-bitwise</a><br />
+<a href="https://stackoverflow.com/questions/21415661/logic-operator-for-boolean-indexing-in-pandas/21415990">Python-logical-not</a><br />
+<a href="https://stackoverflow.com/questions/13600988/python-tilde-unary-operator-as-negation-numpy-bool-array">Numpy-bool-negation</a></p>
+
+
+      <div class="page-footer">
+        <div class="page-share">
+          <a href="https://twitter.com/intent/tweet?text=Logical Not Operation in Numpy&url=http://localhost:4000/logical-not-operation-in-Numpy/" title="Share on Twitter" rel="nofollow" target="_blank">Twitter</a>
+          <a href="https://facebook.com/sharer.php?u=http://localhost:4000/logical-not-operation-in-Numpy/" title="Share on Facebook" rel="nofollow" target="_blank">Facebook</a>
+          <a href="https://plus.google.com/share?url=http://localhost:4000/logical-not-operation-in-Numpy/" title="Share on Google+" rel="nofollow" target="_blank">Google+</a>
+        </div>
+        <div class="page-tag">
+          
+            <a href="/tags#Python" class="tag">&#35; Python</a>
+          
+            <a href="/tags#Numpy" class="tag">&#35; Numpy</a>
+          
+        </div>
+      </div>
+      <section class="comment-area">
+  <div class="comment-wrapper">
+    
+    <div id="disqus_thread" class="article-comments"></div>
+    <script>
+      (function() {
+          var d = document, s = d.createElement('script');
+          s.src = '//hughku.disqus.com/embed.js';
+          s.setAttribute('data-timestamp', +new Date());
+          (d.head || d.body).appendChild(s);
+      })();
+    </script>
+    <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+    
+  </div>
+</section> <!-- End Comment Area -->
+
+    </div> <!-- End Wrap Content -->
+  </div> <!-- End Page Content -->
+</article> <!-- End Article Page -->
+
+</div>
+
+  </div>
+  
+  <script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+  ga('create', '', 'auto');
+  ga('send', 'pageview');
+</script> <!-- End Analytics -->
+
+</body>
+</html>

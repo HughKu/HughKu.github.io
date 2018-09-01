@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>Custom Loss in Keras <br> (from Naive to Example-wise Weighted) - Hugh's Sharing Notes</title>
+
+  <!-- Edit site and author settings in `_config.yml` to make the social details your own -->
+
+    <meta content="Hugh's Sharing Notes" property="og:site_name">
+  
+    <meta content="Custom Loss in Keras <br> (from Naive to Example-wise Weighted)" property="og:title">
+  
+  
+    <meta content="article" property="og:type">
+  
+  
+    <meta content="Some Description on this post" property="og:description">
+  
+  
+    <meta content="http://localhost:4000/example-wise-custom-loss-in-Keras/" property="og:url">
+  
+  
+    <meta content="2018-04-14T04:23:48+08:00" property="article:published_time">
+    <meta content="http://localhost:4000/about/" property="article:author">
+  
+  
+    <meta content="http://localhost:4000/assets/img/MLP.svg" property="og:image">
+  
+  
+    
+  
+  
+    
+    <meta content="Python" property="article:tag">
+    
+    <meta content="Keras" property="article:tag">
+    
+    <meta content="Custom Loss Function" property="article:tag">
+    
+    <meta content="Machine Learning" property="article:tag">
+    
+  
+
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:site" content="@">
+    <meta name="twitter:creator" content="@">
+  
+    <meta name="twitter:title" content="Custom Loss in Keras <br> (from Naive to Example-wise Weighted)">
+  
+  
+    <meta name="twitter:url" content="http://localhost:4000/example-wise-custom-loss-in-Keras/">
+  
+  
+    <meta name="twitter:description" content="Some Description on this post">
+  
+  
+    <meta name="twitter:image:src" content="http://localhost:4000/assets/img/MLP.svg">
+  
+
+	<meta name="description" content="Some Description on this post">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+	<meta property="og:image" content="">
+	<link rel="shortcut icon" href="/assets/img/favicon/favicon.ico" type="image/x-icon">
+	<link rel="apple-touch-icon" href="/assets/img/favicon/apple-touch-icon.png">
+	<link rel="apple-touch-icon" sizes="72x72" href="/assets/img/favicon/apple-touch-icon-72x72.png">
+	<link rel="apple-touch-icon" sizes="144x144" href="/assets/img/favicon/apple-touch-icon-144x144.png">
+	<!-- Chrome, Firefox OS and Opera -->
+	<meta name="theme-color" content="#263959">
+	<!-- Windows Phone -->
+	<meta name="msapplication-navbutton-color" content="#263959">
+	<!-- iOS Safari -->
+	<meta name="apple-mobile-web-app-status-bar-style" content="#263959">
+	<!-- Google Fonts -->
+	<link href="https://fonts.googleapis.com/css?family=PT+Serif:400,700" rel="stylesheet">
+	<link href="https://fonts.googleapis.com/css?family=Lato:300,400,700" rel="stylesheet">
+	<!-- Font Awesome -->
+	<link rel="stylesheet" href="/assets/fonts/font-awesome/css/font-awesome.min.css">
+	<!-- Styles -->
+	<link rel="stylesheet" href="/assets/css/main.css">
+
+   <script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+      tex2jax: {
+        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre'],
+        inlineMath: [['$','$']]
+      }
+    });
+  </script>
+  <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML" type="text/javascript"></script> 
+</head>
+
+<body>
+
+  <div class="wrapper">
+    <aside class="sidebar">
+  <header>
+    <div class="about">
+      <div class="cover-author-image">
+        <a href="/"><img src="/assets/img/hugh-ku.jpg" alt="Wei-Lin (Hugh) Ku"></a>
+      </div>
+      <div class="author-name">Wei-Lin (Hugh) Ku</div>
+      <p>I enjoy applying machine learning and deep learning to data of different field from image and video to finance. Mostly speak Python, C++ and Javascript as well.</p>
+    </div>
+  </header> <!-- End Header -->
+  <footer>
+    <section class="contact">
+      <h3 class="contact-title">Contact me</h3>
+      <ul>
+        
+          <li class="github"><a href="http://github.com/HughKu" target="_blank"><i class="fa fa-github"></i></a></li>
+        
+        
+          <li class="linkedin"><a href="https://in.linkedin.com/in/wei-lin-ku-4552a956" target="_blank"><i class="fa fa-linkedin"></i></a></li>
+        
+        
+          <li class="email"><a href="mailto:hughku@gmail.com"><i class="fa fa-envelope-o"></i></a></li>
+        
+      </ul>
+    </section> <!-- End Section Contact -->
+    <div class="copyright">
+      <p>2018 &copy; Wei-Lin (Hugh) Ku</p>
+    </div>
+  </footer> <!-- End Footer -->
+</aside> <!-- End Sidebar -->
+<div class="content-box clearfix">
+  <article class="article-page">
+  <div class="page-content">
+    
+    <div class="page-cover-image">
+      <figure>
+        <img class="page-image" src=/assets/img/MLP.svg alt="Custom Loss in Keras <br> (from Naive to Example-wise Weighted)">
+        
+      </figure>
+    </div> <!-- End Page Cover Image -->
+    
+    <div class="wrap-content">
+      <header class="header-page">
+        <h1 class="page-title">Custom Loss in Keras <br> (from Naive to Example-wise Weighted)</h1>
+        <div class="page-date"><span>2018, Apr 13&nbsp;&nbsp;&nbsp;&nbsp;</span></div>
+      </header>
+      <p>本篇介紹使用Keras時如何客製化損失函數(custom Loss function)，從簡單至複雜的客製化程度介紹。順道一提，因為工作太忙拖稿了有點久，加上本來是因應自己需求面example-wise weighted custom loss，但發現這樣文章不通順，還是從簡易的built-in loss慢慢延伸到複雜的比較好吸收。</p>
+
+<p>文章會按照以下的順序介紹，希望閱讀者能夠比較好吸收：</p>
+<ul>
+  <li>Built-in Loss Function</li>
+  <li>Custom Loss Function (Mirror)</li>
+  <li>Custom Weighted Loss Function for Mis-classification Usecase</li>
+  <li>Custom Weighted Loss Function for Mis-classification Usecase (example-wise)</li>
+</ul>
+
+<p><br /></p>
+<h2 id="built-in-loss-function">Built-in Loss Function</h2>
+
+<p>就以底下這個典型MLPL多分類模型當作例子，首先，輸入樣本的個數是<code class="highlighter-rouge">k=100</code>，而輸入及輸出樣本的維度是<code class="highlighter-rouge">5</code>及<code class="highlighter-rouge">3</code></p>
+
+<p><img src="/assets/img/MLP.svg" alt="image" /></p>
+
+<p>接著，以下範例使用<a href="https://keras.io/getting-started/functional-api-guide/">Functional API</a>建置MPL模型進行訓練。使用built-in loss非常簡易，只要將字串(name of objective function)傳入<code class="highlighter-rouge">model.compile</code>的參數<code class="highlighter-rouge">loss</code>就行了；例如，我們的多分類例子使用<code class="highlighter-rouge">'categorical_crossentropy'</code>。</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="n">np</span>
+<span class="kn">import</span> <span class="nn">keras.backend</span> <span class="k">as</span> <span class="n">K</span>
+<span class="kn">from</span> <span class="nn">keras.layers</span> <span class="kn">import</span> <span class="n">Input</span><span class="p">,</span> <span class="n">Dense</span><span class="p">,</span> <span class="n">Activation</span>
+<span class="kn">from</span> <span class="nn">keras</span> <span class="kn">import</span> <span class="n">Model</span>
+
+<span class="c"># Prepare training data</span>
+<span class="n">train_X</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="mi">100</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>
+<span class="n">train_Y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">100</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+
+<span class="c"># Define model structure</span>
+<span class="n">data_input</span> <span class="o">=</span> <span class="n">Input</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="mi">5</span><span class="p">,))</span>
+<span class="n">dense_layer</span> <span class="o">=</span> <span class="n">Dense</span><span class="p">(</span><span class="mi">3</span><span class="p">)(</span><span class="n">data_input</span><span class="p">)</span>
+<span class="n">data_output</span> <span class="o">=</span> <span class="n">Activation</span><span class="p">(</span><span class="s">'softmax'</span><span class="p">)(</span><span class="n">dense_layer</span><span class="p">)</span>
+
+<span class="c"># Build model </span>
+<span class="n">model</span> <span class="o">=</span> <span class="n">Model</span><span class="p">(</span><span class="n">data_input</span><span class="p">,</span> <span class="n">data_output</span><span class="p">)</span>
+
+<span class="c"># Compile model</span>
+<span class="n">model</span><span class="o">.</span><span class="nb">compile</span><span class="p">(</span><span class="n">optimizer</span><span class="o">=</span><span class="s">'Adam'</span><span class="p">,</span> 
+              <span class="n">loss</span><span class="o">=</span><span class="s">'categorical_crossentropy'</span><span class="p">,</span>
+              <span class="n">metrics</span><span class="o">=</span><span class="p">[</span><span class="s">'accuracy'</span><span class="p">])</span>
+
+<span class="c"># Fit model, i.e., training</span>
+<span class="n">model</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="p">[</span><span class="n">train_X</span><span class="p">],</span> <span class="n">y</span><span class="o">=</span><span class="p">[</span><span class="n">train_Y</span><span class="p">],</span>
+          <span class="n">epochs</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="mi">32</span><span class="p">)</span>
+</code></pre></div></div>
+<p><br /></p>
+<h2 id="custom-loss-function-mirror">Custom Loss Function (Mirror)</h2>
+
+<p>接著，我們不要用字串而是將<code class="highlighter-rouge">objective function</code>傳入<code class="highlighter-rouge">model.compile</code>的參數<code class="highlighter-rouge">loss</code>也能達到與上面同樣的目的；這就是custom loss function的第一個步驟: 一定要定義一組函數帶有兩個參數，<code class="highlighter-rouge">y_true</code>是true label，<code class="highlighter-rouge">y_pred</code>是prediction label，Keras會在每個batch training此函數，並對batch samples執行loss計算。</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">mirror_loss</span><span class="p">(</span><span class="n">y_true</span><span class="p">,</span> <span class="n">y_pred</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">K</span><span class="o">.</span><span class="n">categorical_crossentropy</span><span class="p">(</span><span class="n">y_true</span><span class="p">,</span> <span class="n">y_pred</span><span class="p">)</span>
+
+<span class="n">custom_loss</span> <span class="o">=</span> <span class="n">mirror_loss</span>
+
+<span class="c"># Compile model with custom loss</span>
+<span class="n">model</span><span class="o">.</span><span class="nb">compile</span><span class="p">(</span><span class="n">optimizer</span><span class="o">=</span><span class="s">'Adam'</span><span class="p">,</span> 
+              <span class="n">loss</span><span class="o">=</span><span class="n">custom_loss</span><span class="p">,</span>
+              <span class="n">metrics</span><span class="o">=</span><span class="p">[</span><span class="s">'accuracy'</span><span class="p">])</span>
+</code></pre></div></div>
+
+<p><br /></p>
+<h2 id="custom-weighted-loss-function-for-mis-classification-usecase">Custom Weighted Loss Function for Mis-classification Usecase</h2>
+
+<p>根據應用面的不同，可能會需要針對預測錯誤的組合給予不同的權重，長得像下面這行公式一樣。</p>
+
+<p>$Loss^k = W_{i, j} * \operatorname{crossentropy_{categorical}}(y_{true}^k, y_{pred}^k)$, where
+$i = {\operatorname{argmax}}(y_{true}^k)$, $j = {\operatorname{argmax}}(y_{pred}^k)$</p>
+
+<p>假設第<code class="highlighter-rouge">k</code>個輸入的true label是第1類，但是被model預測為第2或第3類時，我希望loss權重高一點，例如<code class="highlighter-rouge">2.0</code>；再來，假設其true label是第2或3類，但是被model預測為第1類時，傷害沒那麼大，那我給予較低權重例如<code class="highlighter-rouge">1.2</code>，那我們可以有一組權重表格<code class="highlighter-rouge">W</code>產生出來，給予錯誤的組合不同的loss權重。</p>
+
+<p><img src="/assets/img/table.png" alt="table" /></p>
+
+<p>那先備妥一組table後，要如何塞入custom loss function呢?</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># Create our mis-classification weight table from the above</span>
+<span class="n">weight_table</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="mi">3</span><span class="p">,</span><span class="mi">3</span><span class="p">))</span>
+<span class="n">weight_table</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.2</span>
+<span class="n">weight_table</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="mf">2.0</span>
+<span class="o">...</span>
+<span class="n">weight_table</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="mf">2.0</span>
+</code></pre></div></div>
+
+<p>好，一樣先定義一組function，除了必要的兩個參數，再額外加入另外一組參數<code class="highlighter-rouge">y_weights</code>給table輸入用。 注意，<code class="highlighter-rouge">mis_cls_w_loss</code>的implmenetation就是上面那行公式，有興趣可以剖析看看。</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># Define custom mis-classification weighted loss</span>
+<span class="k">def</span> <span class="nf">mis_cls_w_loss</span><span class="p">(</span><span class="n">y_true</span><span class="p">,</span> <span class="n">y_pred</span><span class="p">,</span> <span class="n">y_weights</span><span class="p">):</span>
+    <span class="n">nb_cl</span> <span class="o">=</span> <span class="n">y_weights</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">final_mask</span> <span class="o">=</span> <span class="n">K</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">y_pred</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">])</span>
+    <span class="n">y_pred_max</span> <span class="o">=</span> <span class="n">K</span><span class="o">.</span><span class="nb">max</span><span class="p">(</span><span class="n">y_pred</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">y_pred_max</span> <span class="o">=</span> <span class="n">K</span><span class="o">.</span><span class="n">expand_dims</span><span class="p">(</span><span class="n">y_pred_max</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="n">y_pred_max_mat</span> <span class="o">=</span> <span class="n">K</span><span class="o">.</span><span class="n">equal</span><span class="p">(</span><span class="n">y_pred</span><span class="p">,</span> <span class="n">y_pred_max</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">c_p</span><span class="p">,</span> <span class="n">c_t</span> <span class="ow">in</span> <span class="n">product</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">nb_cl</span><span class="p">),</span> <span class="nb">range</span><span class="p">(</span><span class="n">nb_cl</span><span class="p">)):</span>
+        <span class="n">final_mask</span> <span class="o">+=</span> <span class="p">(</span><span class="n">K</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span><span class="n">y_weights</span><span class="p">[</span><span class="n">c_t</span><span class="p">,</span> <span class="n">c_p</span><span class="p">],</span> <span class="n">K</span><span class="o">.</span><span class="n">floatx</span><span class="p">())</span> <span class="o">*</span> <span class="n">K</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span><span class="n">y_pred_max_mat</span><span class="p">[:,</span> <span class="n">c_p</span><span class="p">],</span> <span class="n">K</span><span class="o">.</span><span class="n">floatx</span><span class="p">())</span><span class="o">*</span> <span class="n">K</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span><span class="n">y_true</span><span class="p">[:,</span> <span class="n">c_t</span><span class="p">],</span> <span class="n">K</span><span class="o">.</span><span class="n">floatx</span><span class="p">()))</span>
+    <span class="k">return</span> <span class="n">K</span><span class="o">.</span><span class="n">categorical_crossentropy</span><span class="p">(</span><span class="n">y_true</span><span class="p">,</span> <span class="n">y_pred</span><span class="p">)</span> <span class="o">*</span> <span class="n">final_mask</span>
+</code></pre></div></div>
+
+<p>等等，記得上節說過的<strong>一定要定義一組函數帶有兩個參數</strong>，因為Keras custom loss只接受此格式，所以我們還要再另外包裝<code class="highlighter-rouge">mis_cls_w_loss</code>；你可以選擇以下其中一種，記得不要落入<a href="https://hughku.github.io/2018/pitfall-in-lambda/">lambda的陷阱</a>，或是使用functool.partial包裝，如下。</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># Closure the weight tabel into custom_loss</span>
+<span class="n">custom_loss</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">y_true</span><span class="p">,</span> <span class="n">y_pred</span><span class="p">:</span> <span class="n">mis_cls_w_loss</span><span class="p">(</span><span class="n">y_true</span><span class="p">,</span> <span class="n">y_pred</span><span class="p">,</span> <span class="n">y_weights</span><span class="o">=</span><span class="n">weight_table</span><span class="p">)</span>
+
+<span class="c"># Re-package the custom loss using functool.partial</span>
+<span class="n">custom_loss</span> <span class="o">=</span> <span class="n">partial</span><span class="p">(</span><span class="n">mis_cls_w_loss</span><span class="p">,</span> <span class="n">y_weights</span><span class="o">=</span><span class="n">weight_table</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p><br /></p>
+<h2 id="custom-weighted-loss-function-for-mis-classification-usecase-example-wise">Custom Weighted Loss Function for Mis-classification Usecase (Example-wise)</h2>
+
+<p>進階版，如果需要精細到每個樣本的預測錯誤權重不同呢? 公式跟上節的只有微小差異，在於$w_{i, j}^k$的上標<code class="highlighter-rouge">k</code>代表每個樣本都有各自的權重表格。</p>
+
+<p>$Loss^k = w_{i, j}^k * \operatorname{crossentropy_{categorical}}(y_{true}^k, y_{pred}^k)$, where
+$i = {\operatorname{argmax}}(y_{true}^k)$, $j = {\operatorname{argmax}}(y_{pred}^k)$</p>
+
+<p><img src="/assets/img/table2.png" alt="table2" /></p>
+
+<p>所以我們weight table以及custom loss function程式碼只有些微的改變，要注意的是維度的部分，weight table的維度是<code class="highlighter-rouge">(100, 3, 3)</code>。</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># Create our mis-classification weight table per example</span>
+<span class="n">weight_table</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="mi">100</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
+<span class="n">weight_table</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.2</span>
+<span class="n">weight_table</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="mf">2.0</span>
+<span class="o">...</span>
+<span class="n">weight_table</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="mf">2.0</span>
+<span class="o">...</span>
+<span class="o">...</span>
+<span class="n">weight_table</span><span class="p">[</span><span class="mi">99</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="mf">3.2</span>
+<span class="n">weight_table</span><span class="p">[</span><span class="mi">99</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.8</span>
+
+<span class="c"># Define custom mis-classification weighted loss</span>
+<span class="k">def</span> <span class="nf">mis_cls_w_loss</span><span class="p">(</span><span class="n">y_true</span><span class="p">,</span> <span class="n">y_pred</span><span class="p">,</span> <span class="n">y_weights</span><span class="p">):</span>
+    <span class="n">nb_cl</span> <span class="o">=</span> <span class="n">y_weights</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">final_mask</span> <span class="o">=</span> <span class="n">K</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">y_pred</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">])</span>
+    <span class="n">y_pred_max</span> <span class="o">=</span> <span class="n">K</span><span class="o">.</span><span class="nb">max</span><span class="p">(</span><span class="n">y_pred</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">y_pred_max</span> <span class="o">=</span> <span class="n">K</span><span class="o">.</span><span class="n">expand_dims</span><span class="p">(</span><span class="n">y_pred_max</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="n">y_pred_max_mat</span> <span class="o">=</span> <span class="n">K</span><span class="o">.</span><span class="n">equal</span><span class="p">(</span><span class="n">y_pred</span><span class="p">,</span> <span class="n">y_pred_max</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">c_p</span><span class="p">,</span> <span class="n">c_t</span> <span class="ow">in</span> <span class="n">product</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">nb_cl</span><span class="p">),</span> <span class="nb">range</span><span class="p">(</span><span class="n">nb_cl</span><span class="p">)):</span>
+        <span class="n">final_mask</span> <span class="o">+=</span> <span class="p">(</span><span class="n">K</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span><span class="n">y_weights</span><span class="p">[:,</span> <span class="n">c_t</span><span class="p">,</span> <span class="n">c_p</span><span class="p">],</span> <span class="n">K</span><span class="o">.</span><span class="n">floatx</span><span class="p">())</span> <span class="o">*</span> <span class="n">K</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span><span class="n">y_pred_max_mat</span><span class="p">[:,</span> <span class="n">c_p</span><span class="p">],</span> <span class="n">K</span><span class="o">.</span><span class="n">floatx</span><span class="p">())</span><span class="o">*</span> <span class="n">K</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span><span class="n">y_true</span><span class="p">[:,</span> <span class="n">c_t</span><span class="p">],</span> <span class="n">K</span><span class="o">.</span><span class="n">floatx</span><span class="p">()))</span>
+    <span class="k">return</span> <span class="n">K</span><span class="o">.</span><span class="n">categorical_crossentropy</span><span class="p">(</span><span class="n">y_true</span><span class="p">,</span> <span class="n">y_pred</span><span class="p">)</span> <span class="o">*</span> <span class="n">final_mask</span>
+
+<span class="c"># Re-package the custom loss using functool.partial</span>
+<span class="n">custom_loss</span> <span class="o">=</span> <span class="n">partial</span><span class="p">(</span><span class="n">mis_cls_w_loss</span><span class="p">,</span> <span class="n">y_weights</span><span class="o">=</span><span class="n">weight_table</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>再來這裏是重點部份，因為是example-wise，loss在計算時是以batch為單位．上方的<code class="highlighter-rouge">y_weights[:, c_t, c_p]</code>就是在抓取一個batch量的table，在這個的例子中是<code class="highlighter-rouge">(32, 3, 3)</code>或是<code class="highlighter-rouge">(100%32, 3, 3)</code>如果是最後一批batch；所以weight table需要與training data一樣的方式被餵進模型，如下:</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># Define model structure</span>
+<span class="n">weight_input</span> <span class="o">=</span> <span class="n">Input</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span> <span class="c"># -&gt; define weight input layer</span>
+<span class="n">data_input</span> <span class="o">=</span> <span class="n">Input</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="mi">5</span><span class="p">,))</span>
+<span class="n">dense_layer</span> <span class="o">=</span> <span class="n">Dense</span><span class="p">(</span><span class="mi">3</span><span class="p">)(</span><span class="n">data_input</span><span class="p">)</span>
+<span class="n">data_output</span> <span class="o">=</span> <span class="n">Activation</span><span class="p">(</span><span class="s">'softmax'</span><span class="p">)(</span><span class="n">dense_layer</span><span class="p">)</span>
+
+<span class="c"># Build model </span>
+<span class="n">model</span> <span class="o">=</span> <span class="n">Model</span><span class="p">([</span><span class="n">data_input</span><span class="p">,</span> <span class="n">weight_input</span><span class="p">],</span> 
+              <span class="n">data_output</span><span class="p">)</span> <span class="c"># -&gt; define weight input layer</span>
+
+<span class="c"># Compile model</span>
+<span class="n">model</span><span class="o">.</span><span class="nb">compile</span><span class="p">(</span><span class="n">optimizer</span><span class="o">=</span><span class="s">'Adam'</span><span class="p">,</span> 
+              <span class="n">loss</span><span class="o">=</span><span class="n">custom_loss</span><span class="p">,</span>
+              <span class="n">metrics</span><span class="o">=</span><span class="p">[</span><span class="s">'accuracy'</span><span class="p">])</span>
+
+<span class="c"># Fit model, i.e., training</span>
+<span class="n">model</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="p">[</span><span class="n">train_X</span><span class="p">,</span> <span class="n">weight_table</span><span class="p">],</span>
+          <span class="n">y</span><span class="o">=</span><span class="p">[</span><span class="n">train_Y</span><span class="p">],</span> 
+          <span class="n">epochs</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> 
+          <span class="n">batch_size</span><span class="o">=</span><span class="mi">32</span><span class="p">)</span> <span class="c"># -&gt; feed weight table into training</span>
+</code></pre></div></div>
+
+<p><br /></p>
+<h3 id="reference">Reference</h3>
+<p><a href="https://keras.io/">Keras.io</a></p>
+
+
+      <div class="page-footer">
+        <div class="page-share">
+          <a href="https://twitter.com/intent/tweet?text=Custom Loss in Keras <br> (from Naive to Example-wise Weighted)&url=http://localhost:4000/example-wise-custom-loss-in-Keras/" title="Share on Twitter" rel="nofollow" target="_blank">Twitter</a>
+          <a href="https://facebook.com/sharer.php?u=http://localhost:4000/example-wise-custom-loss-in-Keras/" title="Share on Facebook" rel="nofollow" target="_blank">Facebook</a>
+          <a href="https://plus.google.com/share?url=http://localhost:4000/example-wise-custom-loss-in-Keras/" title="Share on Google+" rel="nofollow" target="_blank">Google+</a>
+        </div>
+        <div class="page-tag">
+          
+            <a href="/tags#Python" class="tag">&#35; Python</a>
+          
+            <a href="/tags#Keras" class="tag">&#35; Keras</a>
+          
+            <a href="/tags#Custom Loss Function" class="tag">&#35; Custom Loss Function</a>
+          
+            <a href="/tags#Machine Learning" class="tag">&#35; Machine Learning</a>
+          
+        </div>
+      </div>
+      <section class="comment-area">
+  <div class="comment-wrapper">
+    
+    <div id="disqus_thread" class="article-comments"></div>
+    <script>
+      (function() {
+          var d = document, s = d.createElement('script');
+          s.src = '//hughku.disqus.com/embed.js';
+          s.setAttribute('data-timestamp', +new Date());
+          (d.head || d.body).appendChild(s);
+      })();
+    </script>
+    <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+    
+  </div>
+</section> <!-- End Comment Area -->
+
+    </div> <!-- End Wrap Content -->
+  </div> <!-- End Page Content -->
+</article> <!-- End Article Page -->
+
+</div>
+
+  </div>
+  
+  <script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+  ga('create', '', 'auto');
+  ga('send', 'pageview');
+</script> <!-- End Analytics -->
+
+</body>
+</html>
